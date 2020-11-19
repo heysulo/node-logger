@@ -46,7 +46,7 @@ function updateLockDataFile() {
 //*********************************************************************************************************************
 function isPreviousLogFileExists() {
     try {
-        fs.accessSync(`${logDirectory}/${moduleName}.log`, 'rw');
+        fs.accessSync(`${logDirectory}/${moduleName}.log`, fs.constants.R_OK | fs.constants.W_OK);
         return true;
     } catch (e) {
         return false;
@@ -197,7 +197,7 @@ exports.init = (name, options = {}) => {
 
     if (options.logDirectory) {
         try {
-            fs.accessSync(options.logDirectory, 'rw');
+            fs.accessSync(options.logDirectory, fs.constants.R_OK | fs.constants.W_OK);
         } catch (e) {
             fs.mkdirSync(options.logDirectory);
         }
@@ -209,7 +209,7 @@ exports.init = (name, options = {}) => {
 
 //*********************************************************************************************************************
 exports.write = (data) => {
-    if (logSwitchSize !== definitions.NO_MAX_LOG_SIZE && fs.statSync(currentLogFile).size > logSwitchSize) {
+    if (logSwitchSize !== definitions.NO_MAX_LOG_SIZE && fs.statSync(`${logDirectory}${logFileNames[0]}`).size > logSwitchSize) {
         writeDataToLog(`Switching log files. Maximum file size (${logSwitchSize} Bytes) reached`);
         switchLogFile();
     }
